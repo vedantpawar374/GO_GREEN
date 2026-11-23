@@ -2,7 +2,9 @@ import express from "express";
 
 import {
     registerUser,
-    getCurrentUser
+    getCurrentUser,
+    getLeaderboard,
+    getAdminAnalytics,
 } from "../controllers/userController.js";
 
 import {
@@ -20,6 +22,18 @@ router.get(
     "/me",
     authenticateUser,
     getCurrentUser
+);
+
+router.get(
+    "/leaderboard",
+    authenticateUser,
+    getLeaderboard
+);
+
+router.get(
+    "/admin-analytics",
+    authenticateUser,
+    getAdminAnalytics
 );
 
 export default router;

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
  import jwt from "jsonwebtoken";
 
 import User from "../models/User.js";
+import Activity from "../models/Activity.js";
 
 // add the controller for registration
 export async function registerUser(request,response)
@@ -143,6 +144,68 @@ export async function getCurrentUser(request, response) {
         return response.status(500).json({
             success: false,
             message: "Unable to retrieve user information",
+        });
+    }
+}
+
+export async function getLeaderboard(request, response) {
+    try {
+        const topUsers = await User.find({})
+            .sort({ totalCarbonSaved: -1 })
+            .limit(20)
+            .select("name totalCarbonSaved walletPoints role");
+
+        return response.status(200).json({
+            success: true,
+            leaderboard: topUsers
+        });
+    } catch (error) {
+        console.error("Leaderboard error:", error);
+        return response.status(500).json({
+            success: false,
+            message: "Unable to retrieve leaderboard",
+        });
+    }
+}
+
+export async function getAdminAnalytics(request, response) {
+    try {
+        if (request.user.role !== "admin") {
+            return response.status(403).json({
+                success: false,
+                message: "Admin access is required",
+            });
+        }
+
+        const [totalUsers, pendingActivities, totals] = await Promise.all([
+            User.countDocuments({ role: "user" }),
+            Activity.countDocuments({ status: "pending" }),
+            User.aggregate([
+                { $match: { role: "user" } },
+                {
+                    $group: {
+                        _id: null,
+                        totalCarbonSaved: { $sum: "$totalCarbonSaved" },
+                        totalWalletPoints: { $sum: "$walletPoints" },
+                    },
+                },
+            ]),
+        ]);
+
+        return response.status(200).json({
+            success: true,
+            analytics: {
+                totalUsers,
+                pendingActivities,
+                totalCarbonSaved: totals[0]?.totalCarbonSaved || 0,
+                totalWalletPoints: totals[0]?.totalWalletPoints || 0,
+            },
+        });
+    } catch (error) {
+        console.error("Admin analytics error:", error);
+        return response.status(500).json({
+            success: false,
+            message: "Unable to retrieve admin analytics",
         });
     }
 }

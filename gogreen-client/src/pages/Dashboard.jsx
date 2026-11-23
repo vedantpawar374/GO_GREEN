@@ -10,6 +10,7 @@ function Dashboard() {
     const [activities, setActivities] = useState([]);
     const [loadingActivities, setLoadingActivities] = useState(true);
     const [activityError, setActivityError] = useState("");
+    const [activityRefreshKey, setActivityRefreshKey] = useState(0);
 
     useEffect(() => {
 
@@ -42,7 +43,7 @@ function Dashboard() {
 
         fetchActivities();
 
-    }, []);
+    }, [activityRefreshKey]);
 
 
     return (
@@ -118,7 +119,9 @@ function Dashboard() {
                     Tell us about your eco-friendly activity.
                 </p>
 
-                <CarbonCalculator />
+                <CarbonCalculator
+                    onActivitySubmitted={() => setActivityRefreshKey((key) => key + 1)}
+                />
 
             </section>
 
@@ -158,7 +161,7 @@ function Dashboard() {
 
                     <div className="activity-list">
 
-                        {activities.slice(0, 5).map((activity) => (
+                        {activities.map((activity) => (
 
                             <div
                                 className="activity-card"
@@ -173,8 +176,8 @@ function Dashboard() {
                                     Distance: {activity.distance} km
                                 </p>
 
-                                <p>
-                                    Status: {activity.status}
+                                <p className={`activity-status ${activity.status}`}>
+                                    Status: <strong>{activity.status}</strong>
                                 </p>
 
                                 {activity.status === "approved" && (

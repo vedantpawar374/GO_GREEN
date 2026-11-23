@@ -70,6 +70,11 @@ function CarbonCalculator({ onActivitySubmitted }) {
             const response = await submitActivity(activityData);
             setSuccessMessage(response.message);
             console.log("saved activity", response.activity);
+            setDistance("");
+            setDescription("");
+            setProofImage(null);
+            setImagePreview("");
+            setResult(null);
             onActivitySubmitted?.();
         } catch (error) {
             setError(error.message);
@@ -115,10 +120,10 @@ function CarbonCalculator({ onActivitySubmitted }) {
         }
     };
     return (
-        <div>
+        <div className="carbon-calculator">
             <h1>Carbon Footprint Calculator</h1>
-            <form onSubmit={handleCalculate}>
-                <div>
+            <form className="calculator-form" onSubmit={handleCalculate}>
+                <div className="calculator-field">
                     <label htmlFor="distance">Distance traveled in km</label>
                     <input
                         id="distance"
@@ -130,7 +135,7 @@ function CarbonCalculator({ onActivitySubmitted }) {
                         placeholder="Enter distance travelled"
                     />
                 </div>
-                <div>
+                <div className="calculator-field">
                     <label htmlFor="usedTransport">
                         Transport you used
                     </label>
@@ -149,7 +154,7 @@ function CarbonCalculator({ onActivitySubmitted }) {
                     </select>
                 </div>
 
-                <div>
+                <div className="calculator-field">
                     <label htmlFor="alternativeTransport">
                         Transport you avoided
                     </label>
@@ -166,40 +171,42 @@ function CarbonCalculator({ onActivitySubmitted }) {
                             </option>
                         ))}
                     </select>
-                    <div>
-                        <label htmlFor="description">
-                            Describe your eco-friendly activity
-                        </label>
-                        <textarea
-                            id="description"
-                            value={description}
-                            onChange={(event) =>
-                                setDescription(event.target.value)
-                            }
-                            placeholder="Example: I traveled 20 km by train instead of car"
-                            rows="4"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="proofImage">Upload Proof</label>
-                        <input
-                            id="proofImage"
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            onChange={handleImageChange}
-                        />
-                    </div>
-                    {imagePreview && (
-                        <div>
-                            <p>Selected Proof:</p>
-                            <img
-                                src={imagePreview}
-                                alt="Activity proof preview"
-                                className="proof-preview"
-                            />
-                        </div>
-                    )}
                 </div>
+
+                <div className="calculator-field">
+                    <label htmlFor="description">
+                        Describe your eco-friendly activity
+                    </label>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onChange={(event) => setDescription(event.target.value)}
+                        placeholder="Example: I traveled 20 km by train instead of car"
+                        rows="4"
+                    />
+                </div>
+
+                <div className="calculator-field">
+                    <label htmlFor="proofImage">Upload Proof</label>
+                    <input
+                        id="proofImage"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={handleImageChange}
+                    />
+                </div>
+
+                {imagePreview && (
+                    <div className="proof-preview-container">
+                        <p>Selected Proof:</p>
+                        <img
+                            src={imagePreview}
+                            alt="Activity proof preview"
+                            className="proof-preview"
+                        />
+                    </div>
+                )}
+
                 <button type="submit">Calculate Carbon Saved</button>
             </form>
             {error && <p className="error-message">{error}</p>}

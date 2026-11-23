@@ -5,7 +5,7 @@ import {
     rejectActivity,
 } from "../services/activityService";
 
-function AdminPendingActivities({ refreshTrigger }) {
+function AdminPendingActivities({ refreshTrigger, onActivityUpdated }) {
     const [activities, setActivities] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -32,20 +32,12 @@ function AdminPendingActivities({ refreshTrigger }) {
     }, [refreshTrigger]);
 
     if (isLoading) {
-        return (
-            <section className="admin-activities">
-                <h1>Pending Activities</h1>
-                <p>Loading pending activities...</p>
-            </section>
-        );
+        return null;
     }
 
     if (error) {
         return (
-            <section className="admin-activities">
-                <h1>Pending Activities</h1>
-                <p className="error-message">{error}</p>
-            </section>
+            <p className="error-message admin-activities-error">{error}</p>
         );
     }
     const handleApprove = async (activityId) => {
@@ -67,6 +59,7 @@ function AdminPendingActivities({ refreshTrigger }) {
                 ),
             );
             setSuccessMessage(response.message);
+            onActivityUpdated?.();
         } catch (error) {
             setError(error.message);
         } finally {
@@ -89,7 +82,13 @@ function AdminPendingActivities({ refreshTrigger }) {
             setError(" ");
             setSuccessMessage("");
             const response = await rejectActivity(activityId, rejectionReason);
+            setActivities((currentActivities) =>
+                currentActivities.filter(
+                    (activity) => activity._id !== activityId,
+                ),
+            );
             setSuccessMessage(response.message);
+            onActivityUpdated?.();
         } catch (error) {
             setError(error.message);
         } finally {
@@ -98,24 +97,11 @@ function AdminPendingActivities({ refreshTrigger }) {
     };
 
     return (
-        <section className="admin-activities">
-            <div className="admin-header">
-                <div>
-                    <h1>Pending Activities</h1>
-
-                    <p>Review the activities submitted by users.</p>
-                </div>
-
-                <div className="pending-count">
-                    Pending: {activities.length}
-                </div>
-            </div>
+        <>
             {successMessage && <p className="success-message">{successMessage}</p>}
             {error && <p className="error-message">{error}</p>}
 
-            {activities.length === 0 ? (
-                <p>No pending activities found.</p>
-            ) : (
+            {activities.length > 0 && (
                 <div className="activity-list">
                     {activities.map((activity) => (
                         <article className="activity-card" key={activity._id}>
@@ -190,7 +176,7 @@ function AdminPendingActivities({ refreshTrigger }) {
                     ))}
                 </div>
             )}
-        </section>
+        </>
     );
 }
 

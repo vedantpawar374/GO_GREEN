@@ -9,13 +9,17 @@ import "./App.css";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import Leaderboard from "./pages/Leaderboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Navbar from "./components/Navbar";
 
 function App() {
     return (
-        <Routes>
+        <div className="app-container">
+            <Navbar />
+            <Routes>
 
-            {/* Public Route */}
+                {/* Public Route */}
             <Route
                 path="/login"
                 element={<Login />}
@@ -33,6 +37,11 @@ function App() {
                     path="/admin-dashboard"
                     element={<AdminDashboard />}
                 />
+                
+                <Route
+                    path="/leaderboard"
+                    element={<Leaderboard />}
+                />
 
             </Route>
 
@@ -48,6 +57,7 @@ function App() {
             />
 
         </Routes>
+        </div>
     );
 }
 

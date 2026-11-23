@@ -1,6 +1,16 @@
 const API_BASE_URL = "http://localhost:5000/api";
 
 export async function submitActivity(activityData) {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+    }
+
+    if (!(activityData.proofImage instanceof File)) {
+        throw new Error("Please upload a JPG, PNG, or WEBP proof image.");
+    }
+
     const formData = new FormData();
     formData.append("description", activityData.description);
     formData.append("distance", activityData.distance);
@@ -12,7 +22,6 @@ export async function submitActivity(activityData) {
     formData.append("proofImage", activityData.proofImage);
 
     try {
-        const token = localStorage.getItem("token");
         const response = await fetch(`${API_BASE_URL}/activities`, {
             method: "POST",
             headers: {
@@ -22,13 +31,13 @@ export async function submitActivity(activityData) {
         });
 
         const responseText = await response.text();
-        let responseData = {};
-        if (responseText) {
-            try {
-                responseData = JSON.parse(responseText);
-            } catch {
-                responseData = { message: responseText };
-            }
+        let responseData;
+        try {
+            responseData = responseText ? JSON.parse(responseText) : {};
+        } catch {
+            responseData = {
+                message: "The server returned an unexpected response. Please try again.",
+            };
         }
 
         if (!response.ok) {
