@@ -5,6 +5,7 @@ import {
     getCurrentUser,
     getLeaderboard,
     getAdminAnalytics,
+    getAdminUsersWithActivities,
 } from "../controllers/userController.js";
 
 import {
@@ -34,6 +35,12 @@ router.get(
     "/admin-analytics",
     authenticateUser,
     getAdminAnalytics
+);
+
+router.get(
+    "/admin-users",
+    authenticateUser,
+    getAdminUsersWithActivities
 );
 
 export default router;

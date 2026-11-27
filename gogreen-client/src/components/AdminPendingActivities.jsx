@@ -133,6 +133,10 @@ function AdminPendingActivities({ refreshTrigger, onActivityUpdated }) {
                                         activity.createdAt,
                                     ).toLocaleString()}
                                 </p>
+                                <p>
+                                    <strong>Location:</strong>{" "}
+                                    {activity.location || "Not provided"}
+                                </p>
                             </div>
 
                             <div className="proof-section">
@@ -141,7 +145,7 @@ function AdminPendingActivities({ refreshTrigger, onActivityUpdated }) {
                                 </p>
 
                                 <img
-                                    src={`http://localhost:5000/uploads/${activity.proofImage}`}
+                                    src={`/uploads/${activity.proofImage}`}
                                     alt="Submitted activity proof"
                                     className="admin-proof-image"
                                 />

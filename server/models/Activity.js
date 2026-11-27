@@ -45,6 +45,12 @@ const activitySchema=new mongoose.Schema(
                 "car",
             ],
         },
+        location: {
+            type: String,
+            trim: true,
+            maxlength: 200,
+            default: "",
+        },
         proofImage:{
             type:String,
             required:[true,"proof image is required"],

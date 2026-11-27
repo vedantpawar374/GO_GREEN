@@ -1,4 +1,6 @@
 
+import fs from "fs";
+import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js"
 import express from "express";
 import cors from "cors";
@@ -7,17 +9,28 @@ import path from "path";
 import walletRoutes from "./routes/walletRoutes.js";
 
 import {connectDatabase} from "./config/db.js";
-import activityRoutes from "./routes/activityRoutes.js";
-import userRoutes from "./routes/userroutes.js"
+import activityRoutes from "./routes/activityroutes.js";
+import userRoutes from "./routes/userRoutes.js"
 
 dotenv.config();
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDistPath = path.resolve(__dirname, "../gogreen-client/dist");
 const app=express();
 const port=process.env.PORT || 5000;
 
+const allowedOrigins = [
+    /^http:\/\/localhost:\d+$/,
+    /^http:\/\/127\.0\.0\.1:\d+$/,
+];
+const clientUrl = process.env.CLIENT_URL?.trim().replace(/\/+$/, "");
+if (clientUrl) {
+    allowedOrigins.push(clientUrl);
+}
+
 app.use(
     cors({
-        origin: [/^http:\/\/localhost:\d+$/, /^http:\/\/127\.0\.0\.1:\d+$/],
+        origin: allowedOrigins,
     })
 );
 
@@ -26,14 +39,14 @@ app.use(express.urlencoded({extended:true}));
 
 app.use(
     "/uploads",
-    express.static(path.resolve("uploads"))
+    express.static(path.resolve(__dirname, "uploads"))
 );
 
-app.get("/",(request,response)=>{
-    response.json(({
-        sucess:true,
-        message:"GOGreen API is running",
-    }));
+app.get("/api/health", (request, response) => {
+    response.json({
+        success: true,
+        message: "GOGreen API is running",
+    });
 });
 app.use("/api/activities",activityRoutes);
 
@@ -57,6 +70,21 @@ app.use((error, request, response, next) => {
 });
 
 app.use("/api/auth",authRoutes);
+
+if (fs.existsSync(clientDistPath)) {
+    app.use(express.static(clientDistPath));
+
+    app.use((request, response, next) => {
+        if (
+            request.method === "GET" &&
+            !request.path.startsWith("/api") &&
+            !request.path.startsWith("/uploads")
+        ) {
+            return response.sendFile(path.join(clientDistPath, "index.html"));
+        }
+        next();
+    });
+}
 
 async function startServer(){
     await connectDatabase();

@@ -1,4 +1,5 @@
 import Activity from "../models/Activity.js";
+import WalletTransaction from "../models/WalletTransaction.js";
 import { calculateCarbonResult } from "../server/services/CarbonEngine.js";
 import mongoose from "mongoose";
 import { addPoints } from "../server/services/WalletService.js";
@@ -12,6 +13,7 @@ export async function createActivity(request, response) {
             distance,
             usedTransport,
             alternativeTransport,
+            location,
         } = request.body;
 
         const userId = request.user.userId;
@@ -32,6 +34,7 @@ export async function createActivity(request, response) {
         const normalizedDescription = String(description).trim();
         const normalizedUsedTransport = String(usedTransport).trim().toLowerCase();
         const normalizedAlternativeTransport = String(alternativeTransport).trim().toLowerCase();
+        const normalizedLocation = location ? String(location).trim() : "";
         const numericDistance = Number(distance);
 
         if (!normalizedDescription || !Number.isFinite(numericDistance) || numericDistance <= 0) {
@@ -61,6 +64,7 @@ export async function createActivity(request, response) {
             distance: numericDistance,
             usedTransport: normalizedUsedTransport,
             alternativeTransport: normalizedAlternativeTransport,
+            location: normalizedLocation,
             proofImage: request.file.filename,
             status: "pending",
             carbonSaved: null,

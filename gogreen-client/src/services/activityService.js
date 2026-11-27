@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 export async function submitActivity(activityData) {
     const token = localStorage.getItem("token");
@@ -20,6 +20,9 @@ export async function submitActivity(activityData) {
         activityData.alternativeTransport
     );
     formData.append("proofImage", activityData.proofImage);
+    if (activityData.location) {
+        formData.append("location", activityData.location);
+    }
 
     try {
         const response = await fetch(`${API_BASE_URL}/activities`, {

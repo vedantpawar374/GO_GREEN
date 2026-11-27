@@ -66,11 +66,15 @@ function Leaderboard() {
                                         </div>
                                     </div>
                                     <div className="carbon-saved">
-                                        <span className="value">{user.totalCarbonSaved}</span>
+                                        <span className="value">
+                                            {Number(user.totalCarbonSaved || 0).toFixed(2)}
+                                        </span>
                                         <span className="unit">kg CO₂</span>
                                     </div>
                                     <div className="points">
-                                        <span className="value">{user.walletPoints}</span>
+                                        <span className="value">
+                                            {Number(user.walletPoints || 0).toLocaleString()}
+                                        </span>
                                     </div>
                                 </div>
                             );
